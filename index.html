@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Carrera de Países - Overlay Minimalista</title>
+<title>Carrera de Países - Overlay Mejorado</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -23,14 +23,26 @@ body {
   background: #000;
 }
 
-/* Líneas cortas blancas que simulan la pista */
+/* Línea de pista prolongada y centrada */
 .track {
   position: absolute;
-  top: 50%;
+  top: 50%;  /* centro vertical */
+  left: 0;
   height: 4px;
-  width: 50px; /* longitud corta de cada línea */
+  width: 100%; /* ocupa toda la barra */
   background: #fff;
   transform: translateY(-50%);
+}
+
+/* Meta visible al final */
+.meta {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 100%;
+  background: red;
+  z-index: 20;
 }
 
 .car {
@@ -83,13 +95,12 @@ body {
 </head>
 <body>
 
-<h2>🏁 Carrera de Países - Overlay Minimalista</h2>
+<h2>🏁 Carrera de Países - Overlay Mejorado</h2>
 
 <!-- Pistas -->
 <div class="track-container" id="brazil-track-container">
-  <div class="track" style="left:0"></div>
-  <div class="track" style="left:100px"></div>
-  <div class="track" style="left:200px"></div>
+  <div class="track"></div>
+  <div class="meta"></div>
   <div class="car" id="brazil-car">
     <img src="https://i.imgur.com/brasilCar.png" alt="Brasil">
     <img src="https://i.imgur.com/rosaEmoji.png" alt="Rosa">
@@ -97,9 +108,8 @@ body {
 </div>
 
 <div class="track-container" id="canada-track-container">
-  <div class="track" style="left:0"></div>
-  <div class="track" style="left:100px"></div>
-  <div class="track" style="left:200px"></div>
+  <div class="track"></div>
+  <div class="meta"></div>
   <div class="car" id="canada-car">
     <img src="https://i.imgur.com/canadaCar.png" alt="Canadá">
     <img src="https://i.imgur.com/tiktokLogo.png" alt="TikTok">
@@ -107,9 +117,8 @@ body {
 </div>
 
 <div class="track-container" id="spain-track-container">
-  <div class="track" style="left:0"></div>
-  <div class="track" style="left:100px"></div>
-  <div class="track" style="left:200px"></div>
+  <div class="track"></div>
+  <div class="meta"></div>
   <div class="car" id="spain-car">
     <img src="https://i.imgur.com/spainCar.png" alt="España">
     <img src="https://i.imgur.com/heartFire.png" alt="Corazón">
@@ -117,9 +126,8 @@ body {
 </div>
 
 <div class="track-container" id="usa-track-container">
-  <div class="track" style="left:0"></div>
-  <div class="track" style="left:100px"></div>
-  <div class="track" style="left:200px"></div>
+  <div class="track"></div>
+  <div class="meta"></div>
   <div class="car" id="usa-car">
     <img src="https://i.imgur.com/usaCar.png" alt="EEUU">
     <img src="https://i.imgur.com/iceCream.png" alt="Helado">
@@ -142,18 +150,13 @@ const cars = {
 
 const finishLine = 800; // pixeles
 
-// Animación de líneas cortas de la pista
-let trackOffset = 0;
+// Animación de líneas de pista (puedes agregar movimiento si quieres)
 function moveTrack() {
-  trackOffset -= 6; // velocidad
-  for(let c in cars){
-    const lines = cars[c].container.querySelectorAll('.track');
-    lines.forEach(line => {
-      line.style.left = ((parseInt(line.style.left) + trackOffset) % 900) + "px";
-    });
-  }
+  // Ahora la línea es fija, no se mueve
   requestAnimationFrame(moveTrack);
 }
+
+moveTrack();
 
 // Mostrar fruta/regalo que da boost
 function spawnFruit(country) {
@@ -204,8 +207,6 @@ document.addEventListener("keydown", e=>{
     case "r": spawnFruit("EEUU"); break;
   }
 });
-
-moveTrack();
 </script>
 
 </body>
