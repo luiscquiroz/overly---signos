@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Carrera de Países - Overlay Fluido</title>
+<title>Carrera de Países - Overlay Minimalista</title>
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #111;
+  background: #000;
   color: white;
   overflow: hidden;
   width: 900px;
@@ -20,7 +20,7 @@ body {
   overflow: hidden;
   margin-bottom: 20px;
   border-radius: 12px;
-  background: #222;
+  background: #000;
 }
 
 .track {
@@ -29,12 +29,13 @@ body {
   left: 0;
   height: 100%;
   width: 200%;
+  /* pista negra con rayas blancas */
   background: repeating-linear-gradient(
     to right,
-    #555 0px,
-    #555 30px,
-    #fff 30px,
-    #fff 35px
+    #fff 0px,
+    #fff 20px,
+    #000 20px,
+    #000 40px
   );
 }
 
@@ -88,7 +89,7 @@ body {
 </head>
 <body>
 
-<h2>🏁 Carrera de Países - Overlay Interactivo</h2>
+<h2>🏁 Carrera de Países - Overlay Minimalista</h2>
 
 <div class="track-container" id="brazil-track-container">
   <div class="track" id="brazil-track"></div>
@@ -159,8 +160,7 @@ function spawnFruit(country) {
   fruit.style.left = "800px";
   car.container.appendChild(fruit);
 
-  // Boost visual del carro
-  car.pos += 20; 
+  car.pos += 20; // boost visual del carro
   car.el.style.left = car.pos + "px";
 
   setTimeout(()=>{car.container.removeChild(fruit)},2000);
@@ -200,7 +200,6 @@ document.addEventListener("keydown", e=>{
   }
 });
 
-// Iniciar animación de pista
 moveTrack();
 </script>
 
