@@ -1,204 +1,121 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="es">
 <head>
 <meta charset="UTF-8">
-
+<title>Overlay Manual Live</title>
 <style>
-
-body{
-font-family:Arial;
-background:#111;
-color:white;
-width:350px;
-padding:10px;
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: white;
+  width: 600px;
+  padding: 10px;
+  overflow: hidden;
 }
-
-.sign{
-margin:10px 0;
+.sign {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
-
-.label{
-font-size:16px;
-margin-bottom:4px;
-font-weight:bold;
+.label {
+  font-size: 16px;
+  margin-right: 10px;
+  width: 120px;
+  font-weight: bold;
 }
-
-.bar{
-width:100%;
-height:22px;
-background:#222;
-border-radius:12px;
-overflow:hidden;
+.bar-container {
+  flex: 1;
+  background: #222;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  height: 28px;
 }
-
-.fill{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#ff00cc,#00ffee);
-transition:width 0.4s;
+.fill {
+  height: 100%;
+  width: 0px;
+  background: linear-gradient(90deg, #ff00cc, #00ffee);
+  transition: width 0.3s;
 }
-
-.winner{
-box-shadow:0 0 12px #00ffee;
+.controls {
+  margin-left: 10px;
 }
-
-.score{
-font-size:12px;
-opacity:0.7;
+button {
+  margin: 2px;
+  padding: 4px 6px;
+  font-size: 12px;
+  cursor: pointer;
 }
-
+.leader {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
 </style>
-
 </head>
-
 <body>
 
+<div class="leader" id="leader">LÍDER: ---</div>
 <div id="bars"></div>
 
-<script 
-src="https://tikfinity.zerody.one/overlay.js"></script>
-
 <script>
+// Configuración de signos / equipos
+const teams = ["LEO", "TAURO", "GEMINIS"];
+let scores = {};
+const container = document.getElementById("bars");
+const leaderEl = document.getElementById("leader");
 
-const signos = {
+// Crear barras y controles
+teams.forEach(team => {
+  scores[team] = 50; // valor inicial
+  const div = document.createElement("div");
+  div.className = "sign";
+  div.innerHTML = `
+    <div class="label">${team}</div>
+    <div class="bar-container">
+      <div class="fill" id="bar-${team}"></div>
+    </div>
+    <div class="controls">
+      <button onclick="changeScore('${team}', 10)">+10</button>
+      <button onclick="changeScore('${team}', 5)">+5</button>
+      <button onclick="changeScore('${team}', -5)">-5</button>
+    </div>
+  `;
+  container.appendChild(div);
+});
 
-ARIES:"♈ ARIES",
-TAURO:"♉ TAURO",
-GEMINIS:"♊ GEMINIS",
-CANCER:"♋ CANCER",
-LEO:"♌ LEO",
-VIRGO:"♍ VIRGO",
-LIBRA:"♎ LIBRA",
-ESCORPIO:"♏ ESCORPIO",
-SAGITARIO:"♐ SAGITARIO",
-CAPRICORNIO:"♑ CAPRICORNIO",
-ACUARIO:"♒ ACUARIO",
-PISCIS:"♓ PISCIS"
-
+// Función para actualizar barra
+function updateBars() {
+  for (let team in scores) {
+    const width = Math.max(0, scores[team]); // evitar negativos
+    document.getElementById(`bar-${team}`).style.width = width + "px";
+  }
 }
 
-let scores={}
-let maxScore=1
-
-const container=document.getElementById("bars")
-
-Object.values(signos).forEach(s=>{
-
-scores[s]=0
-
-let div=document.createElement("div")
-div.className="sign"
-
-div.innerHTML=`
-<div class="label">${s} <span id="score_${s}" class="score">0</span></div>
-<div class="bar">
-<div id="${s}" class="fill"></div>
-</div>
-`
-
-container.appendChild(div)
-
-})
-
-function updateBars(){
-
-maxScore=Math.max(...Object.values(scores),1)
-
-let leader=null
-let top=0
-
-for(let sign in scores){
-
-let percent=(scores[sign]/maxScore)*100
-
-document.getElementById(sign).style.width=percent+"%"
-
-document.getElementById("score_"+sign).innerText=scores[sign]
-
-if(scores[sign]>top){
-top=scores[sign]
-leader=sign
+// Función para cambiar puntaje manual
+function changeScore(team, value) {
+  scores[team] += value;
+  if (scores[team] < 0) scores[team] = 0;
+  updateBars();
+  updateLeader();
 }
 
+// Función para actualizar líder
+function updateLeader() {
+  let max = -1, leader = "---";
+  for (let t in scores) {
+    if (scores[t] > max) {
+      max = scores[t];
+      leader = t;
+    }
+  }
+  leaderEl.textContent = "LÍDER: " + leader;
 }
 
-document.querySelectorAll(".fill").forEach(e=>e.classList.remove("winner"))
-
-if(leader){
-document.getElementById(leader).classList.add("winner")
-}
-
-}
-
-function addSign(sign,points=1){
-
-if(!scores[sign]) return
-
-scores[sign]+=points
-
-updateBars()
-
-}
-
-function detectSign(text){
-
-text=text.toUpperCase()
-
-for(let key in signos){
-
-if(text.includes(key)) return signos[key]
-
-}
-
-if(text.includes("♈")) return signos.ARIES
-if(text.includes("♉")) return signos.TAURO
-if(text.includes("♊")) return signos.GEMINIS
-if(text.includes("♋")) return signos.CANCER
-if(text.includes("♌")) return signos.LEO
-if(text.includes("♍")) return signos.VIRGO
-if(text.includes("♎")) return signos.LIBRA
-if(text.includes("♏")) return signos.ESCORPIO
-if(text.includes("♐")) return signos.SAGITARIO
-if(text.includes("♑")) return signos.CAPRICORNIO
-if(text.includes("♒")) return signos.ACUARIO
-if(text.includes("♓")) return signos.PISCIS
-
-return null
-
-}
-
-window.addEventListener('onEventReceived', function (obj) {
-
-const listener = obj.detail.listener
-const data = obj.detail.event
-
-// comentarios
-if(listener === "comment"){
-
-let sign=detectSign(data.comment)
-
-if(sign){
-addSign(sign,5)
-}
-
-}
-
-// regalos
-if(listener === "gift"){
-
-let sign=detectSign(data.comment || "")
-
-if(sign){
-addSign(sign,30)
-}
-
-}
-
-})
-
+// Inicializar barras
+updateBars();
+updateLeader();
 </script>
 
 </body>
-
 </html>
