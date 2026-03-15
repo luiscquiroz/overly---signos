@@ -65,7 +65,10 @@ button {
 </head>
 <body>
 
-<div class="leader" id="leader">MEJOR-PUNTUACIÓN: ---</div>
+<div class="leader" id="leader">
+  <span id="leader-name"></span>
+  <img id="leader-logo" src="" alt="" style="height:24px; margin-left:8px; vertical-align:middle;">
+</div>
 <div id="bars"></div>
 
 <script>
@@ -94,14 +97,6 @@ teams.forEach(team => {
 });
 
 // Actualizar barra
-function updateBars() {
-  for (let team in scores) {
-    const width = Math.max(0, scores[team]);
-    document.getElementById(`bar-${team}`).style.width = width + "px";
-  }
-}
-
-// Actualizar líder
 function updateLeader() {
   let max = -1, leader = "---";
   for (let t in scores) {
@@ -110,7 +105,19 @@ function updateLeader() {
       leader = t;
     }
   }
-  leaderEl.textContent = `⚡ ${leader} lidera ⚡ ¡dona o tap tap para apoyarlo!`;
+
+  // Nombres llamativos
+  const leaderText = `🔥 ${leader} lidera! ¡Dona o tap tap para apoyarlo!`;
+  document.getElementById("leader-name").textContent = leaderText;
+
+  // Map de logos por equipo (puedes cambiar URL a tus imágenes)
+  const logos = {
+    "LEO": "https://i.imgur.com/yourLeoLogo.png",
+    "TAURO": "https://i.imgur.com/yourTauroLogo.png",
+    "GEMINIS": "https://i.imgur.com/yourGeminisLogo.png"
+  };
+
+  document.getElementById("leader-logo").src = logos[leader] || "";
 }
 
 // Crear indicador flotante
