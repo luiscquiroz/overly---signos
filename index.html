@@ -2,40 +2,48 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Carrera de Países - Live</title>
+<title>Carrera de Países - Overlay</title>
 <style>
 body {
   font-family: Arial, sans-serif;
   background: #111;
   color: white;
+  overflow: hidden;
   width: 900px;
   padding: 20px;
-  overflow: hidden;
 }
-.track {
+.track-container {
   position: relative;
+  width: 100%;
   height: 80px;
+  overflow: hidden;
   margin-bottom: 20px;
   background: #222;
   border-radius: 12px;
-  overflow: hidden;
 }
-.finish-line {
+.track {
   position: absolute;
-  right: 0;
   top: 0;
-  width: 10px;
+  left: 0;
   height: 100%;
-  background: #ffcc00;
+  width: 200%;
+  background: repeating-linear-gradient(
+    to right,
+    #444,
+    #444 50px,
+    #333 50px,
+    #333 100px
+  );
 }
 .car {
   position: absolute;
+  left: 50px;
   top: 10px;
-  left: 0;
   height: 60px;
   display: flex;
   align-items: center;
   transition: left 0.1s linear;
+  z-index: 10;
 }
 .car img {
   height: 40px;
@@ -46,18 +54,17 @@ body {
   height: 24px;
   width: 24px;
   pointer-events: none;
-  animation: floatUp 1s linear forwards;
+  animation: moveFruit 2s linear forwards;
+  z-index: 5;
 }
-@keyframes floatUp {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-30px); opacity: 0; }
+@keyframes moveFruit {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-900px); opacity: 0; }
 }
 #winner {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0,0,0,0.9);
   color: #ffcc00;
   font-size: 60px;
@@ -68,42 +75,39 @@ body {
   display: none;
   flex-direction: column;
 }
-#winner img {
-  height: 100px;
-  margin-top: 20px;
-}
+#winner img { height: 100px; margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<h2>🏁 Carrera de Países - ¡Gana tu país con regalos!</h2>
+<h2>🏁 Carrera de Países - Overlay interactivo</h2>
 
-<div class="track" id="brazil-track">
-  <div class="finish-line"></div>
+<div class="track-container" id="brazil-track-container">
+  <div class="track" id="brazil-track"></div>
   <div class="car" id="brazil-car">
     <img src="https://i.imgur.com/brasilCar.png" alt="Brasil">
     <img src="https://i.imgur.com/rosaEmoji.png" alt="Rosa">
   </div>
 </div>
 
-<div class="track" id="canada-track">
-  <div class="finish-line"></div>
+<div class="track-container" id="canada-track-container">
+  <div class="track" id="canada-track"></div>
   <div class="car" id="canada-car">
     <img src="https://i.imgur.com/canadaCar.png" alt="Canadá">
     <img src="https://i.imgur.com/tiktokLogo.png" alt="TikTok">
   </div>
 </div>
 
-<div class="track" id="spain-track">
-  <div class="finish-line"></div>
+<div class="track-container" id="spain-track-container">
+  <div class="track" id="spain-track"></div>
   <div class="car" id="spain-car">
     <img src="https://i.imgur.com/spainCar.png" alt="España">
     <img src="https://i.imgur.com/heartFire.png" alt="Corazón">
   </div>
 </div>
 
-<div class="track" id="usa-track">
-  <div class="finish-line"></div>
+<div class="track-container" id="usa-track-container">
+  <div class="track" id="usa-track"></div>
   <div class="car" id="usa-car">
     <img src="https://i.imgur.com/usaCar.png" alt="EEUU">
     <img src="https://i.imgur.com/iceCream.png" alt="Helado">
@@ -118,45 +122,41 @@ body {
 <script>
 // Configuración de carros
 const cars = {
-  "Brasil": {el: document.getElementById("brazil-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("brazil-track"), icon: "https://i.imgur.com/strawberry.png"},
-  "Canadá": {el: document.getElementById("canada-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("canada-track"), icon: "https://i.imgur.com/apple.png"},
-  "España": {el: document.getElementById("spain-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("spain-track"), icon: "https://i.imgur.com/banana.png"},
-  "EEUU": {el: document.getElementById("usa-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("usa-track"), icon: "https://i.imgur.com/cherry.png"}
+  "Brasil": {el: document.getElementById("brazil-car"), pos: 50, container: document.getElementById("brazil-track-container"), icon: "https://i.imgur.com/strawberry.png"},
+  "Canadá": {el: document.getElementById("canada-car"), pos: 50, container: document.getElementById("canada-track-container"), icon: "https://i.imgur.com/apple.png"},
+  "España": {el: document.getElementById("spain-car"), pos: 50, container: document.getElementById("spain-track-container"), icon: "https://i.imgur.com/banana.png"},
+  "EEUU": {el: document.getElementById("usa-car"), pos: 50, container: document.getElementById("usa-track-container"), icon: "https://i.imgur.com/cherry.png"}
 };
 
-const finishLine = 700;
+const finishLine = 800; // pixeles
 
-// Mostrar frutas/regalos
-function showFruit(track, icon) {
-  const fruit = document.createElement("img");
-  fruit.src = icon;
-  fruit.className = "fruit";
-  fruit.style.left = Math.random()*50 + "px";
-  track.appendChild(fruit);
-  setTimeout(()=>track.removeChild(fruit),1000);
-}
-
-// Boost por regalo
-function addBoost(country, amount) {
-  const car = cars[country];
-  car.boost += amount;
-  showFruit(car.track, car.icon);
-}
-
-// Movimiento continuo
-function raceLoop() {
-  for (let c in cars) {
-    const car = cars[c];
-    car.pos += car.baseSpeed + car.boost;
-    if(car.pos > finishLine) car.pos = finishLine;
-    car.el.style.left = car.pos + "px";
-    if(car.boost > 0) car.boost -= 0.02; // decay del boost
-    if(car.pos >= finishLine) {
-      showWinner(c);
-      return;
-    }
+// Animación de la pista
+let trackOffset = 0;
+function moveTrack() {
+  trackOffset -= 2; // velocidad de pista
+  for(let c in cars){
+    const container = cars[c].container.querySelector('.track');
+    container.style.left = trackOffset + "px";
   }
-  requestAnimationFrame(raceLoop);
+  requestAnimationFrame(moveTrack);
+}
+
+// Mostrar fruta/regalo que da boost
+function spawnFruit(country) {
+  const car = cars[country];
+  const fruit = document.createElement("img");
+  fruit.src = car.icon;
+  fruit.className = "fruit";
+  fruit.style.top = Math.random()*30 + "px";
+  fruit.style.left = "800px";
+  car.container.appendChild(fruit);
+  car.pos += 20; // boost visual del carro
+  car.el.style.left = car.pos + "px";
+  setTimeout(()=>{car.container.removeChild(fruit)},2000);
+
+  if(car.pos >= finishLine){
+    showWinner(country);
+  }
 }
 
 // Mostrar ganador
@@ -171,28 +171,25 @@ function showWinner(country) {
 }
 
 // Reiniciar carrera
-function resetRace() {
-  for(let c in cars) {
-    cars[c].pos = 0;
-    cars[c].boost = 0;
-    cars[c].el.style.left = "0px";
+function resetRace(){
+  for(let c in cars){
+    cars[c].pos = 50;
+    cars[c].el.style.left = "50px";
   }
   document.getElementById("winner").style.display = "none";
-  raceLoop();
 }
 
 // Teclas para simular regalos/interacciones
 document.addEventListener("keydown", e=>{
   switch(e.key){
-    case "q": addBoost("Brasil", 0.5); break;
-    case "w": addBoost("Canadá", 1); break;
-    case "e": addBoost("España", 1.5); break;
-    case "r": addBoost("EEUU", 2); break;
+    case "q": spawnFruit("Brasil"); break;
+    case "w": spawnFruit("Canadá"); break;
+    case "e": spawnFruit("España"); break;
+    case "r": spawnFruit("EEUU"); break;
   }
 });
 
-// Iniciar carrera
-raceLoop();
+moveTrack();
 </script>
 
 </body>
