@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Overlay Live Marcas</title>
+<title>Overlay Manual Live - Marcas</title>
 <style>
 body {
   font-family: Arial, sans-serif;
   background: #111;
   color: white;
-  width: 650px;
+  width: 600px;
   padding: 10px;
   overflow: hidden;
 }
@@ -58,6 +58,7 @@ button {
   margin-left: 8px;
   vertical-align: middle;
 }
+/* Indicador flotante */
 .floating {
   position: absolute;
   font-size: 14px;
@@ -65,28 +66,8 @@ button {
   pointer-events: none;
   opacity: 1;
   transition: transform 1s ease-out, opacity 1s ease-out;
-  color: #ffff00; 
-  left: 50%;
-}
-.rules {
-  margin-top: 20px;
-  border: 1px solid #555;
-  padding: 10px;
-  background: #222;
-  border-radius: 10px;
-}
-.rules h3 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  text-align: center;
-  color: #ffcc00;
-}
-.rules ul {
-  padding-left: 20px;
-}
-.rules li {
-  margin: 4px 0;
-  font-size: 14px;
+  color: #ffff00;   /* amarillo brillante */
+  left: 50%;        /* centra horizontalmente */
 }
 </style>
 </head>
@@ -119,7 +100,7 @@ const container = document.getElementById("bars");
 const leaderEl = document.getElementById("leader-name");
 const leaderLogo = document.getElementById("leader-logo");
 
-// Logos por marca (cambia URL por tus imágenes)
+// Logos por marca (cambia URL por tus imágenes reales)
 const logos = {
   "Apple": "https://i.imgur.com/appleLogo.png",
   "Samsung": "https://i.imgur.com/samsungLogo.png",
@@ -128,7 +109,7 @@ const logos = {
 
 // Crear barras y controles
 teams.forEach(team => {
-  scores[team] = 50;
+  scores[team] = 8; // valor inicial
   const div = document.createElement("div");
   div.className = "sign";
   div.innerHTML = `
@@ -137,12 +118,9 @@ teams.forEach(team => {
       <div class="fill" id="bar-${team}"></div>
     </div>
     <div class="controls">
-      <button onclick="handleAction('${team}','💬')">Comentar</button>
-      <button onclick="handleAction('${team}','🌸')">Rosa</button>
-      <button onclick="handleAction('${team}','🎩')">Sombrero</button>
-      <button onclick="handleAction('${team}','🌌')">Galaxia</button>
-      <button onclick="handleAction('${team}','🔫')">Pistola</button>
-      <button onclick="handleAction('${team}','💰')">Dona</button>
+      <button onclick="changeScore('${team}', 2)">+2</button>
+      <button onclick="changeScore('${team}', 0.05)">+0.05</button>
+      <button onclick="changeScore('${team}', -0.05)">-0.05</button>
     </div>
   `;
   container.appendChild(div);
@@ -151,8 +129,8 @@ teams.forEach(team => {
 // Actualizar barras
 function updateBars() {
   for (let team in scores) {
-    const width = Math.max(0, Math.min(100, scores[team]));
-    document.getElementById(`bar-${team}`).style.width = width + "%";
+    const width = Math.max(0, scores[team]); 
+    document.getElementById(`bar-${team}`).style.width = width + "px";
   }
 }
 
@@ -165,7 +143,11 @@ function updateLeader() {
       leader = t;
     }
   }
-  leaderEl.textContent = `⚡ ${leader} lidera ⚡ ¡comenta o dona para apoyarlo!`;
+
+  // Texto llamativo para incentivar
+  leaderEl.textContent = `⚡ ${leader} lidera ⚡ ¡dona o tap tap para apoyarlo!`;
+
+  // Logo al lado
   leaderLogo.src = logos[leader] || "";
 }
 
@@ -187,46 +169,36 @@ function showFloating(team, value) {
   }, 1200);
 }
 
-// Función para manejar acciones / comentarios / regalos
-function handleAction(team, action) {
-  switch(action) {
-    case "💬": // Comentario normal
-      changeScore(team, 0.05);
-      break;
-    case "🌸": 
-      changeScore(team, 2);
-      break;
-    case "🎩": 
-      changeScore(team, 6);
-      break;
-    case "🌌": 
-      scores[team] = 100;
-      updateBars();
-      showFloating(team,"MAX");
-      updateLeader();
-      break;
-    case "🔫": 
-      changeScore(team, -2);
-      break;
-    case "💰": 
-      changeScore(team, -0.05);
-      break;
-  }
-}
-
-// Cambiar puntaje
+// Cambiar puntaje manual
 function changeScore(team, value) {
   scores[team] += value;
   if (scores[team] < 0) scores[team] = 0;
-  if (scores[team] > 100) scores[team] = 100;
   updateBars();
   updateLeader();
-  showFloating(team,value);
+  showFloating(team, value);
 }
 
 // Inicializar
 updateBars();
 updateLeader();
+
+// --------------------------
+// Control con teclado
+// --------------------------
+document.addEventListener("keydown", function(event) {
+    switch(event.key.toLowerCase()) {
+        case "q": changeScore("Apple", 2); break;
+        case "w": changeScore("Samsung", 2); break;
+        case "e": changeScore("Xiaomi", 2); break;
+        case "a": changeScore("Apple", 0.05); break;
+        case "s": changeScore("Samsung", 0.05); break;
+        case "d": changeScore("Xiaomi", 0.05); break;
+        case "z": changeScore("Apple", -0.05); break;
+        case "x": changeScore("Samsung", -0.05); break;
+        case "c": changeScore("Xiaomi", -0.05); break;
+    }
+});
 </script>
+
 </body>
 </html>
