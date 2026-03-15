@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Overlay Manual Live con Indicadores</title>
+<title>Overlay Manual Live - Marcas</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -50,6 +50,13 @@ button {
 .leader {
   font-size: 18px;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+#leader-logo {
+  height: 24px;
+  margin-left: 8px;
+  vertical-align: middle;
 }
 /* Indicador flotante */
 .floating {
@@ -59,7 +66,7 @@ button {
   pointer-events: none;
   opacity: 1;
   transition: transform 1s ease-out, opacity 1s ease-out;
-  color: #ff0;
+  color: #ffff00; /* amarillo brillante para resaltar */
 }
 </style>
 </head>
@@ -67,19 +74,29 @@ button {
 
 <div class="leader" id="leader">
   <span id="leader-name"></span>
-  <img id="leader-logo" src="" alt="" style="height:24px; margin-left:8px; vertical-align:middle;">
+  <img id="leader-logo" src="" alt="">
 </div>
+
 <div id="bars"></div>
 
 <script>
-const teams = ["SAMSUNG", "XIAOMI", "APPLE"];
+// Equipos / marcas
+const teams = ["Apple", "Samsung", "Xiaomi"];
 let scores = {};
 const container = document.getElementById("bars");
-const leaderEl = document.getElementById("leader");
+const leaderEl = document.getElementById("leader-name");
+const leaderLogo = document.getElementById("leader-logo");
+
+// Logos por marca (cambia URL por tus imágenes reales)
+const logos = {
+  "Apple": "https://i.imgur.com/appleLogo.png",
+  "Samsung": "https://i.imgur.com/samsungLogo.png",
+  "Xiaomi": "https://i.imgur.com/xiaomiLogo.png"
+};
 
 // Crear barras y controles
 teams.forEach(team => {
-  scores[team] = 8; // valor inicial
+  scores[team] = 50; // valor inicial
   const div = document.createElement("div");
   div.className = "sign";
   div.innerHTML = `
@@ -96,7 +113,15 @@ teams.forEach(team => {
   container.appendChild(div);
 });
 
-// Actualizar barra
+// Actualizar barras
+function updateBars() {
+  for (let team in scores) {
+    const width = Math.max(0, scores[team]); 
+    document.getElementById(`bar-${team}`).style.width = width + "px";
+  }
+}
+
+// Mostrar líder
 function updateLeader() {
   let max = -1, leader = "---";
   for (let t in scores) {
@@ -106,21 +131,14 @@ function updateLeader() {
     }
   }
 
-  // Nombres llamativos
-  const leaderText = `🔥 ${leader} lidera! ¡Dona o tap tap para apoyarlo!`;
-  document.getElementById("leader-name").textContent = leaderText;
+  // Texto llamativo para incentivar
+  leaderEl.textContent = `⚡ ${leader} lidera ⚡ ¡dona o tap tap para apoyarlo!`;
 
-  // Map de logos por equipo (puedes cambiar URL a tus imágenes)
-  const logos = {
-    "LEO": "https://i.imgur.com/yourLeoLogo.png",
-    "TAURO": "https://i.imgur.com/yourTauroLogo.png",
-    "GEMINIS": "https://i.imgur.com/yourGeminisLogo.png"
-  };
-
-  document.getElementById("leader-logo").src = logos[leader] || "";
+  // Logo al lado
+  leaderLogo.src = logos[leader] || "";
 }
 
-// Crear indicador flotante
+// Indicador flotante
 function showFloating(team, value) {
   const barContainer = document.querySelector(`#bar-${team}`).parentElement;
   const floatEl = document.createElement("div");
@@ -128,13 +146,11 @@ function showFloating(team, value) {
   floatEl.textContent = (value > 0 ? "+" : "") + value;
   barContainer.appendChild(floatEl);
 
-  // Animación hacia arriba y fade out
   setTimeout(() => {
     floatEl.style.transform = "translateY(-30px)";
     floatEl.style.opacity = "0";
   }, 50);
 
-  // Eliminar después de 1.2s
   setTimeout(() => {
     barContainer.removeChild(floatEl);
   }, 1200);
@@ -152,6 +168,20 @@ function changeScore(team, value) {
 // Inicializar
 updateBars();
 updateLeader();
+
+// --------------------------
+// Control con teclado
+// --------------------------
+document.addEventListener("keydown", function(event) {
+    switch(event.key.toLowerCase()) {
+        case "q": changeScore("Apple", 2); break;
+        case "w": changeScore("Samsung", 2); break;
+        case "e": changeScore("Xiaomi", 2); break;
+        case "a": changeScore("Apple", -0.05); break;
+        case "s": changeScore("Samsung", -0.05); break;
+        case "d": changeScore("Xiaomi", -0.05); break;
+    }
+});
 </script>
 
 </body>
