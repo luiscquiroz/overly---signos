@@ -76,7 +76,7 @@ const leaderEl = document.getElementById("leader");
 
 // Crear barras y controles
 teams.forEach(team => {
-  scores[team] = 50; // valor inicial
+  scores[team] = 10; // valor inicial
   const div = document.createElement("div");
   div.className = "sign";
   div.innerHTML = `
@@ -85,9 +85,9 @@ teams.forEach(team => {
       <div class="fill" id="bar-${team}"></div>
     </div>
     <div class="controls">
-      <button onclick="changeScore('${team}', 10)">+10</button>
-      <button onclick="changeScore('${team}', 5)">+5</button>
-      <button onclick="changeScore('${team}', -5)">-5</button>
+      <button onclick="changeScore('${team}', 2)">+2</button>
+      <button onclick="changeScore('${team}', 0.5)">+0.5</button>
+      <button onclick="changeScore('${team}', -0.5)">-0.5</button>
     </div>
   `;
   container.appendChild(div);
