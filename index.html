@@ -23,20 +23,14 @@ body {
   background: #000;
 }
 
+/* Líneas cortas blancas que simulan la pista */
 .track {
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 200%;
-  /* pista negra con rayas blancas */
-  background: repeating-linear-gradient(
-    to right,
-    #fff 0px,
-    #fff 20px,
-    #000 20px,
-    #000 40px
-  );
+  top: 50%;
+  height: 4px;
+  width: 50px; /* longitud corta de cada línea */
+  background: #fff;
+  transform: translateY(-50%);
 }
 
 .car {
@@ -91,8 +85,11 @@ body {
 
 <h2>🏁 Carrera de Países - Overlay Minimalista</h2>
 
+<!-- Pistas -->
 <div class="track-container" id="brazil-track-container">
-  <div class="track" id="brazil-track"></div>
+  <div class="track" style="left:0"></div>
+  <div class="track" style="left:100px"></div>
+  <div class="track" style="left:200px"></div>
   <div class="car" id="brazil-car">
     <img src="https://i.imgur.com/brasilCar.png" alt="Brasil">
     <img src="https://i.imgur.com/rosaEmoji.png" alt="Rosa">
@@ -100,7 +97,9 @@ body {
 </div>
 
 <div class="track-container" id="canada-track-container">
-  <div class="track" id="canada-track"></div>
+  <div class="track" style="left:0"></div>
+  <div class="track" style="left:100px"></div>
+  <div class="track" style="left:200px"></div>
   <div class="car" id="canada-car">
     <img src="https://i.imgur.com/canadaCar.png" alt="Canadá">
     <img src="https://i.imgur.com/tiktokLogo.png" alt="TikTok">
@@ -108,7 +107,9 @@ body {
 </div>
 
 <div class="track-container" id="spain-track-container">
-  <div class="track" id="spain-track"></div>
+  <div class="track" style="left:0"></div>
+  <div class="track" style="left:100px"></div>
+  <div class="track" style="left:200px"></div>
   <div class="car" id="spain-car">
     <img src="https://i.imgur.com/spainCar.png" alt="España">
     <img src="https://i.imgur.com/heartFire.png" alt="Corazón">
@@ -116,7 +117,9 @@ body {
 </div>
 
 <div class="track-container" id="usa-track-container">
-  <div class="track" id="usa-track"></div>
+  <div class="track" style="left:0"></div>
+  <div class="track" style="left:100px"></div>
+  <div class="track" style="left:200px"></div>
   <div class="car" id="usa-car">
     <img src="https://i.imgur.com/usaCar.png" alt="EEUU">
     <img src="https://i.imgur.com/iceCream.png" alt="Helado">
@@ -139,13 +142,15 @@ const cars = {
 
 const finishLine = 800; // pixeles
 
-// Animación de la pista
+// Animación de líneas cortas de la pista
 let trackOffset = 0;
 function moveTrack() {
-  trackOffset -= 4; // velocidad de la pista
+  trackOffset -= 6; // velocidad
   for(let c in cars){
-    const container = cars[c].container.querySelector('.track');
-    container.style.transform = `translateX(${trackOffset}px)`;
+    const lines = cars[c].container.querySelectorAll('.track');
+    lines.forEach(line => {
+      line.style.left = ((parseInt(line.style.left) + trackOffset) % 900) + "px";
+    });
   }
   requestAnimationFrame(moveTrack);
 }
