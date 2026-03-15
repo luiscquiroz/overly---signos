@@ -2,202 +2,197 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Overlay Manual Live - Marcas</title>
+<title>Carrera de Países - Live</title>
 <style>
 body {
   font-family: Arial, sans-serif;
   background: #111;
   color: white;
-  width: 600px;
-  padding: 10px;
+  width: 900px;
+  padding: 20px;
   overflow: hidden;
 }
-.sign {
-  margin: 15px 0;
-  display: flex;
-  align-items: center;
+.track {
   position: relative;
-}
-.label {
-  font-size: 16px;
-  margin-right: 10px;
-  width: 120px;
-  font-weight: bold;
-}
-.bar-container {
-  flex: 1;
+  height: 80px;
+  margin-bottom: 20px;
   background: #222;
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
-  position: relative;
-  height: 28px;
 }
-.fill {
+.finish-line {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 10px;
   height: 100%;
-  width: 0px;
-  background: linear-gradient(90deg, #ff00cc, #00ffee);
-  transition: width 0.3s;
+  background: #ffcc00;
 }
-.controls {
-  margin-left: 10px;
-}
-button {
-  margin: 2px;
-  padding: 4px 6px;
-  font-size: 12px;
-  cursor: pointer;
-}
-.leader {
-  font-size: 18px;
-  margin-bottom: 10px;
+.car {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  height: 60px;
   display: flex;
   align-items: center;
+  transition: left 0.1s linear;
 }
-#leader-logo {
-  height: 24px;
-  margin-left: 8px;
-  vertical-align: middle;
+.car img {
+  height: 40px;
+  margin-right: 10px;
 }
-/* Indicador flotante */
-.floating {
+.fruit {
   position: absolute;
-  font-size: 14px;
-  font-weight: bold;
+  height: 24px;
+  width: 24px;
   pointer-events: none;
-  opacity: 1;
-  transition: transform 1s ease-out, opacity 1s ease-out;
-  color: #ffff00;   /* amarillo brillante */
-  left: 50%;        /* centra horizontalmente */
+  animation: floatUp 1s linear forwards;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-30px); opacity: 0; }
+}
+#winner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  color: #ffcc00;
+  font-size: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  display: none;
+  flex-direction: column;
+}
+#winner img {
+  height: 100px;
+  margin-top: 20px;
 }
 </style>
 </head>
 <body>
 
-<div class="leader" id="leader">
-  <span id="leader-name"></span>
-  <img id="leader-logo" src="" alt="">
+<h2>🏁 Carrera de Países - ¡Gana tu país con regalos!</h2>
+
+<div class="track" id="brazil-track">
+  <div class="finish-line"></div>
+  <div class="car" id="brazil-car">
+    <img src="https://i.imgur.com/brasilCar.png" alt="Brasil">
+    <img src="https://i.imgur.com/rosaEmoji.png" alt="Rosa">
+  </div>
 </div>
 
-<div id="bars"></div>
+<div class="track" id="canada-track">
+  <div class="finish-line"></div>
+  <div class="car" id="canada-car">
+    <img src="https://i.imgur.com/canadaCar.png" alt="Canadá">
+    <img src="https://i.imgur.com/tiktokLogo.png" alt="TikTok">
+  </div>
+</div>
 
-<div class="rules">
-  <h3>-</h3>
-  <ul>
-    <li>💬 Comentario normal = +0.05 puntos</li>
-    <li>🌸 Rosa = +2 puntos (comenta tu favorito)</li>
-    <li>🎩 Sombrero = +6 puntos (comenta tu favorito)</li>
-    <li>🌌 Galaxia = llena toda la barra (comenta tu favorito)</li>
-    <li>🔫 Pistola = -2 puntos (comenta a quien)</li>
-    <li>💰 Tap Tap = + 0.05 puntos</li>
-  </ul>
+<div class="track" id="spain-track">
+  <div class="finish-line"></div>
+  <div class="car" id="spain-car">
+    <img src="https://i.imgur.com/spainCar.png" alt="España">
+    <img src="https://i.imgur.com/heartFire.png" alt="Corazón">
+  </div>
+</div>
+
+<div class="track" id="usa-track">
+  <div class="finish-line"></div>
+  <div class="car" id="usa-car">
+    <img src="https://i.imgur.com/usaCar.png" alt="EEUU">
+    <img src="https://i.imgur.com/iceCream.png" alt="Helado">
+  </div>
+</div>
+
+<div id="winner">
+  <div id="winner-text"></div>
+  <img id="winner-logo" src="">
 </div>
 
 <script>
-// Equipos / marcas
-const teams = ["Apple", "Samsung", "Xiaomi"];
-let scores = {};
-const container = document.getElementById("bars");
-const leaderEl = document.getElementById("leader-name");
-const leaderLogo = document.getElementById("leader-logo");
-
-// Logos por marca (cambia URL por tus imágenes reales)
-const logos = {
-  "Apple": "https://i.imgur.com/appleLogo.png",
-  "Samsung": "https://i.imgur.com/samsungLogo.png",
-  "Xiaomi": "https://i.imgur.com/xiaomiLogo.png"
+// Configuración de carros
+const cars = {
+  "Brasil": {el: document.getElementById("brazil-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("brazil-track"), icon: "https://i.imgur.com/strawberry.png"},
+  "Canadá": {el: document.getElementById("canada-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("canada-track"), icon: "https://i.imgur.com/apple.png"},
+  "España": {el: document.getElementById("spain-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("spain-track"), icon: "https://i.imgur.com/banana.png"},
+  "EEUU": {el: document.getElementById("usa-car"), pos: 0, baseSpeed: 0.5, boost: 0, track: document.getElementById("usa-track"), icon: "https://i.imgur.com/cherry.png"}
 };
 
-// Crear barras y controles
-teams.forEach(team => {
-  scores[team] = 8; // valor inicial
-  const div = document.createElement("div");
-  div.className = "sign";
-  div.innerHTML = `
-    <div class="label">${team}</div>
-    <div class="bar-container">
-      <div class="fill" id="bar-${team}"></div>
-    </div>
-    <div class="controls">
-      <button onclick="changeScore('${team}', 2)">+2</button>
-      <button onclick="changeScore('${team}', 0.05)">+0.05</button>
-      <button onclick="changeScore('${team}', -0.05)">-0.05</button>
-    </div>
-  `;
-  container.appendChild(div);
-});
+const finishLine = 700;
 
-// Actualizar barras
-function updateBars() {
-  for (let team in scores) {
-    const width = Math.max(0, scores[team]); 
-    document.getElementById(`bar-${team}`).style.width = width + "px";
-  }
+// Mostrar frutas/regalos
+function showFruit(track, icon) {
+  const fruit = document.createElement("img");
+  fruit.src = icon;
+  fruit.className = "fruit";
+  fruit.style.left = Math.random()*50 + "px";
+  track.appendChild(fruit);
+  setTimeout(()=>track.removeChild(fruit),1000);
 }
 
-// Mostrar líder
-function updateLeader() {
-  let max = -1, leader = "---";
-  for (let t in scores) {
-    if (scores[t] > max) {
-      max = scores[t];
-      leader = t;
+// Boost por regalo
+function addBoost(country, amount) {
+  const car = cars[country];
+  car.boost += amount;
+  showFruit(car.track, car.icon);
+}
+
+// Movimiento continuo
+function raceLoop() {
+  for (let c in cars) {
+    const car = cars[c];
+    car.pos += car.baseSpeed + car.boost;
+    if(car.pos > finishLine) car.pos = finishLine;
+    car.el.style.left = car.pos + "px";
+    if(car.boost > 0) car.boost -= 0.02; // decay del boost
+    if(car.pos >= finishLine) {
+      showWinner(c);
+      return;
     }
   }
-
-  // Texto llamativo para incentivar
-  leaderEl.textContent = `⚡ ${leader} lidera ⚡ ¡dona o tap tap para apoyarlo!`;
-
-  // Logo al lado
-  leaderLogo.src = logos[leader] || "";
+  requestAnimationFrame(raceLoop);
 }
 
-// Indicador flotante
-function showFloating(team, value) {
-  const barContainer = document.querySelector(`#bar-${team}`).parentElement;
-  const floatEl = document.createElement("div");
-  floatEl.className = "floating";
-  floatEl.textContent = (value > 0 ? "+" : "") + value;
-  barContainer.appendChild(floatEl);
-
-  setTimeout(() => {
-    floatEl.style.transform = "translateX(-50%) translateY(-30px)";
-    floatEl.style.opacity = "0";
-  }, 50);
-
-  setTimeout(() => {
-    barContainer.removeChild(floatEl);
-  }, 1200);
+// Mostrar ganador
+function showWinner(country) {
+  const winnerDiv = document.getElementById("winner");
+  const text = document.getElementById("winner-text");
+  const logo = document.getElementById("winner-logo");
+  winnerDiv.style.display = "flex";
+  text.textContent = `${country} GANÓ 🏆`;
+  logo.src = cars[country].icon;
+  setTimeout(resetRace,3000);
 }
 
-// Cambiar puntaje manual
-function changeScore(team, value) {
-  scores[team] += value;
-  if (scores[team] < 0) scores[team] = 0;
-  updateBars();
-  updateLeader();
-  showFloating(team, value);
+// Reiniciar carrera
+function resetRace() {
+  for(let c in cars) {
+    cars[c].pos = 0;
+    cars[c].boost = 0;
+    cars[c].el.style.left = "0px";
+  }
+  document.getElementById("winner").style.display = "none";
+  raceLoop();
 }
 
-// Inicializar
-updateBars();
-updateLeader();
-
-// --------------------------
-// Control con teclado
-// --------------------------
-document.addEventListener("keydown", function(event) {
-    switch(event.key.toLowerCase()) {
-        case "q": changeScore("Apple", 2); break;
-        case "w": changeScore("Samsung", 2); break;
-        case "e": changeScore("Xiaomi", 2); break;
-        case "a": changeScore("Apple", 0.05); break;
-        case "s": changeScore("Samsung", 0.05); break;
-        case "d": changeScore("Xiaomi", 0.05); break;
-        case "z": changeScore("Apple", -0.05); break;
-        case "x": changeScore("Samsung", -0.05); break;
-        case "c": changeScore("Xiaomi", -0.05); break;
-    }
+// Teclas para simular regalos/interacciones
+document.addEventListener("keydown", e=>{
+  switch(e.key){
+    case "q": addBoost("Brasil", 0.5); break;
+    case "w": addBoost("Canadá", 1); break;
+    case "e": addBoost("España", 1.5); break;
+    case "r": addBoost("EEUU", 2); break;
+  }
 });
+
+// Iniciar carrera
+raceLoop();
 </script>
 
 </body>
