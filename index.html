@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Carrera de Países - Overlay</title>
+<title>Carrera de Países - Overlay Fluido</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -12,15 +12,17 @@ body {
   width: 900px;
   padding: 20px;
 }
+
 .track-container {
   position: relative;
   width: 100%;
   height: 80px;
   overflow: hidden;
   margin-bottom: 20px;
-  background: #222;
   border-radius: 12px;
+  background: #222;
 }
+
 .track {
   position: absolute;
   top: 0;
@@ -29,12 +31,13 @@ body {
   width: 200%;
   background: repeating-linear-gradient(
     to right,
-    #444,
-    #444 50px,
-    #333 50px,
-    #333 100px
+    #555 0px,
+    #555 30px,
+    #fff 30px,
+    #fff 35px
   );
 }
+
 .car {
   position: absolute;
   left: 50px;
@@ -45,10 +48,12 @@ body {
   transition: left 0.1s linear;
   z-index: 10;
 }
+
 .car img {
   height: 40px;
   margin-right: 10px;
 }
+
 .fruit {
   position: absolute;
   height: 24px;
@@ -57,10 +62,12 @@ body {
   animation: moveFruit 2s linear forwards;
   z-index: 5;
 }
+
 @keyframes moveFruit {
   0% { transform: translateX(0); opacity: 1; }
   100% { transform: translateX(-900px); opacity: 0; }
 }
+
 #winner {
   position: absolute;
   top: 0; left: 0;
@@ -75,12 +82,13 @@ body {
   display: none;
   flex-direction: column;
 }
+
 #winner img { height: 100px; margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<h2>🏁 Carrera de Países - Overlay interactivo</h2>
+<h2>🏁 Carrera de Países - Overlay Interactivo</h2>
 
 <div class="track-container" id="brazil-track-container">
   <div class="track" id="brazil-track"></div>
@@ -133,10 +141,10 @@ const finishLine = 800; // pixeles
 // Animación de la pista
 let trackOffset = 0;
 function moveTrack() {
-  trackOffset -= 2; // velocidad de pista
+  trackOffset -= 4; // velocidad de la pista
   for(let c in cars){
     const container = cars[c].container.querySelector('.track');
-    container.style.left = trackOffset + "px";
+    container.style.transform = `translateX(${trackOffset}px)`;
   }
   requestAnimationFrame(moveTrack);
 }
@@ -150,8 +158,11 @@ function spawnFruit(country) {
   fruit.style.top = Math.random()*30 + "px";
   fruit.style.left = "800px";
   car.container.appendChild(fruit);
-  car.pos += 20; // boost visual del carro
+
+  // Boost visual del carro
+  car.pos += 20; 
   car.el.style.left = car.pos + "px";
+
   setTimeout(()=>{car.container.removeChild(fruit)},2000);
 
   if(car.pos >= finishLine){
@@ -189,6 +200,7 @@ document.addEventListener("keydown", e=>{
   }
 });
 
+// Iniciar animación de pista
 moveTrack();
 </script>
 
