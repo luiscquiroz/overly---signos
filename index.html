@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Overlay Manual Live</title>
+<title>Overlay Manual Live con Indicadores</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -51,6 +51,16 @@ button {
   font-size: 18px;
   margin-bottom: 10px;
 }
+/* Indicador flotante */
+.floating {
+  position: absolute;
+  font-size: 14px;
+  font-weight: bold;
+  pointer-events: none;
+  opacity: 1;
+  transition: transform 1s ease-out, opacity 1s ease-out;
+  color: #0ff;
+}
 </style>
 </head>
 <body>
@@ -59,7 +69,6 @@ button {
 <div id="bars"></div>
 
 <script>
-// Configuración de signos / equipos
 const teams = ["LEO", "TAURO", "GEMINIS"];
 let scores = {};
 const container = document.getElementById("bars");
@@ -84,23 +93,15 @@ teams.forEach(team => {
   container.appendChild(div);
 });
 
-// Función para actualizar barra
+// Actualizar barra
 function updateBars() {
   for (let team in scores) {
-    const width = Math.max(0, scores[team]); // evitar negativos
+    const width = Math.max(0, scores[team]);
     document.getElementById(`bar-${team}`).style.width = width + "px";
   }
 }
 
-// Función para cambiar puntaje manual
-function changeScore(team, value) {
-  scores[team] += value;
-  if (scores[team] < 0) scores[team] = 0;
-  updateBars();
-  updateLeader();
-}
-
-// Función para actualizar líder
+// Actualizar líder
 function updateLeader() {
   let max = -1, leader = "---";
   for (let t in scores) {
@@ -112,7 +113,36 @@ function updateLeader() {
   leaderEl.textContent = "LÍDER: " + leader;
 }
 
-// Inicializar barras
+// Crear indicador flotante
+function showFloating(team, value) {
+  const barContainer = document.querySelector(`#bar-${team}`).parentElement;
+  const floatEl = document.createElement("div");
+  floatEl.className = "floating";
+  floatEl.textContent = (value > 0 ? "+" : "") + value;
+  barContainer.appendChild(floatEl);
+
+  // Animación hacia arriba y fade out
+  setTimeout(() => {
+    floatEl.style.transform = "translateY(-30px)";
+    floatEl.style.opacity = "0";
+  }, 50);
+
+  // Eliminar después de 1.2s
+  setTimeout(() => {
+    barContainer.removeChild(floatEl);
+  }, 1200);
+}
+
+// Cambiar puntaje manual
+function changeScore(team, value) {
+  scores[team] += value;
+  if (scores[team] < 0) scores[team] = 0;
+  updateBars();
+  updateLeader();
+  showFloating(team, value);
+}
+
+// Inicializar
 updateBars();
 updateLeader();
 </script>
