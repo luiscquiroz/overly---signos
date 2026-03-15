@@ -66,7 +66,8 @@ button {
   pointer-events: none;
   opacity: 1;
   transition: transform 1s ease-out, opacity 1s ease-out;
-  color: #ffff00; /* amarillo brillante para resaltar */
+  color: #ffff00;   /* amarillo brillante */
+  left: 50%;        /* centra horizontalmente */
 }
 </style>
 </head>
@@ -147,7 +148,7 @@ function showFloating(team, value) {
   barContainer.appendChild(floatEl);
 
   setTimeout(() => {
-    floatEl.style.transform = "translateY(-30px)";
+    floatEl.style.transform = "translateX(-50%) translateY(-30px)";
     floatEl.style.opacity = "0";
   }, 50);
 
