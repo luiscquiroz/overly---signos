@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+body{
+font-family:Arial;
+background:#111;
+color:white;
+width:350px;
+padding:10px;
+}
+
+.sign{
+margin:10px 0;
+}
+
+.label{
+font-size:16px;
+margin-bottom:4px;
+font-weight:bold;
+}
+
+.bar{
+width:100%;
+height:22px;
+background:#222;
+border-radius:12px;
+overflow:hidden;
+}
+
+.fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#ff00cc,#00ffee);
+transition:width 0.4s;
+}
+
+.winner{
+box-shadow:0 0 12px #00ffee;
+}
+
+.score{
+font-size:12px;
+opacity:0.7;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="bars"></div>
+
+<script>
+
+const signos = {
+
+ARIES:"♈ ARIES",
+TAURO:"♉ TAURO",
+GEMINIS:"♊ GEMINIS",
+CANCER:"♋ CANCER",
+LEO:"♌ LEO",
+VIRGO:"♍ VIRGO",
+LIBRA:"♎ LIBRA",
+ESCORPIO:"♏ ESCORPIO",
+SAGITARIO:"♐ SAGITARIO",
+CAPRICORNIO:"♑ CAPRICORNIO",
+ACUARIO:"♒ ACUARIO",
+PISCIS:"♓ PISCIS"
+
+}
+
+let scores={}
+let maxScore=1
+
+const container=document.getElementById("bars")
+
+Object.values(signos).forEach(s=>{
+
+scores[s]=0
+
+let div=document.createElement("div")
+div.className="sign"
+
+div.innerHTML=`
+<div class="label">${s} <span id="score_${s}" class="score">0</span></div>
+<div class="bar">
+<div id="${s}" class="fill"></div>
+</div>
+`
+
+container.appendChild(div)
+
+})
+
+function updateBars(){
+
+maxScore=Math.max(...Object.values(scores),1)
+
+let leader=null
+let top=0
+
+for(let sign in scores){
+
+let percent=(scores[sign]/maxScore)*100
+
+document.getElementById(sign).style.width=percent+"%"
+
+document.getElementById("score_"+sign).innerText=scores[sign]
+
+if(scores[sign]>top){
+top=scores[sign]
+leader=sign
+}
+
+}
+
+document.querySelectorAll(".fill").forEach(e=>e.classList.remove("winner"))
+
+if(leader){
+document.getElementById(leader).classList.add("winner")
+}
+
+}
+
+function addSign(sign,points=1){
+
+if(!scores[sign]) return
+
+scores[sign]+=points
+
+updateBars()
+
+}
+
+function detectSign(text){
+
+text=text.toUpperCase()
+
+for(let key in signos){
+
+if(text.includes(key)) return signos[key]
+
+}
+
+if(text.includes("♈")) return signos.ARIES
+if(text.includes("♉")) return signos.TAURO
+if(text.includes("♊")) return signos.GEMINIS
+if(text.includes("♋")) return signos.CANCER
+if(text.includes("♌")) return signos.LEO
+if(text.includes("♍")) return signos.VIRGO
+if(text.includes("♎")) return signos.LIBRA
+if(text.includes("♏")) return signos.ESCORPIO
+if(text.includes("♐")) return signos.SAGITARIO
+if(text.includes("♑")) return signos.CAPRICORNIO
+if(text.includes("♒")) return signos.ACUARIO
+if(text.includes("♓")) return signos.PISCIS
+
+return null
+
+}
+
+window.addEventListener('onEventReceived', function (obj) {
+
+const listener = obj.detail.listener
+const data = obj.detail.event
+
+// comentarios
+if(listener === "comment"){
+
+let sign=detectSign(data.comment)
+
+if(sign){
+addSign(sign,5)
+}
+
+}
+
+// regalos
+if(listener === "gift"){
+
+let sign=detectSign(data.comment || "")
+
+if(sign){
+addSign(sign,30)
+}
+
+}
+
+})
+
+</script>
+
+</body>
+
+</html>
